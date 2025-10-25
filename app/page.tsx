@@ -1,65 +1,143 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import {
+  createExpense,
+  filterByAmount,
+  getOverallTotal,
+  getTotalByCategory,
+  deleteExpense,
+} from "./func/utils.js";
 
 export default function Home() {
+  const [visibleState, setVisibleState] = useState(false);
+  const [globalExpensesCategory, setGlobalExpensesCategory] = useState("");
+  const [globalExpensesAmount, setGlobalExpensesAmount] = useState("");
+  const [globalExpensesDescription, setGlobalExpensesDescription] =
+    useState("");
+  const [totalCategory, setTotalCategory] = useState("");
+  const [filterCategoryInputValue, setFilterCategoryInputValue] = useState("");
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
+  const [minMaxFilterValue, setMinMaxFilterValue] = useState([]);
+  const [expenseArr, setExpenseArr] = useState([]);
+
+  function resyncUI() {
+    setGlobalExpensesCategory("");
+    setGlobalExpensesAmount("");
+    setGlobalExpensesDescription("");
+  }
+
+  function handleCreateExpense() {
+    setExpenseArr((prev) => [
+      ...prev,
+      createExpense(
+        globalExpensesCategory,
+        globalExpensesDescription,
+        globalExpensesAmount
+      ),
+    ]);
+    resyncUI();
+  }
+
+  function handleFilterVisibility() {
+    return setVisibleState((prev) => (prev === true ? false : true));
+  }
+  function handleAdvancedFilter() {
+    setTotalCategory(getTotalByCategory(expenseArr, filterCategoryInputValue));
+    setTotalExpenses(getOverallTotal(expenseArr));
+    setMinMaxFilterValue((prev) => [
+      ...prev,
+      ...filterByAmount(minValue, maxValue, expenseArr),
+    ]);
+  }
+
+  function handleDeleteExpense(id) {
+    setExpenseArr((prev) => {
+      const updatedArr = deleteExpense(id, [...prev]);
+      return [...updatedArr];
+    });
+  }
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="big_wrapper">
+      <div
+        className="advanced_filtering_container"
+        style={{ display: visibleState ? "block" : "none" }}
+      >
+        <input
+          value={filterCategoryInputValue}
+          name="filter-category"
+          placeholder="filter category"
+          type="text"
+          onChange={(e) => setFilterCategoryInputValue(e.target.value)}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <input
+          type="text"
+          name="filter-min-value"
+          placeholder="filter min value"
+          onChange={(e) => setMinValue(+e.target.value)}
+        />
+        <input
+          type="text"
+          name="filter-max-value"
+          placeholder="filter max value"
+          onChange={(e) => setMaxValue(+e.target.value)}
+        />
+        <button onClick={handleAdvancedFilter}>advanced informations</button>
+        <div className="advanced_info_container">
+          total amount category: {totalCategory}
+          total amount expenses : {totalExpenses}
+          <ul>
+            filter by amount :{" "}
+            {minMaxFilterValue.map((elem, id) => (
+              <li key={id}>
+                <button onClick={() => handleDeleteExpense(id)}>delete</button>{" "}
+                {elem.category}
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
+
+      <div className="expense_input_container">
+        <input
+          type="text"
+          name="category"
+          value={globalExpensesCategory}
+          placeholder="category"
+          onChange={(e) => setGlobalExpensesCategory(e.target.value)}
+        />
+        <input
+          type="text"
+          name="description"
+          value={globalExpensesDescription}
+          placeholder="description"
+          onChange={(e) => setGlobalExpensesDescription(e.target.value)}
+        />
+
+        <input
+          type="number"
+          name="amount"
+          value={globalExpensesAmount}
+          placeholder="amount"
+          onChange={(e) => setGlobalExpensesAmount(+e.target.value)}
+        />
+
+        <button onClick={handleCreateExpense}>add expense</button>
+
+        <span onClick={handleFilterVisibility} className="advanced_filter_btn">
+          {visibleState ? "advanced filter hide" : "advanced filter show"}
+        </span>
+      </div>
+      <div>
+        {expenseArr.map((exp) => (
+          <li key={exp.id}>
+            <button onClick={() => handleDeleteExpense(exp.id)}>delete</button>
+            {exp.category} - {exp.description} - {exp.amount}
+          </li>
+        ))}
+      </div>
     </div>
   );
 }
