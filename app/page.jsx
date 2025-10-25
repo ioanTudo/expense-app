@@ -86,28 +86,41 @@ export default function Home() {
         />
         <button onClick={handleAdvancedFilter}>advanced informations</button>
         <div className="advanced_info_container">
-          total amount category: {totalCategory}
-          total amount expenses : {totalExpenses}
-          <ul>
-            filter by amount :{" "}
-            {minMaxFilterValue.map((elem, id) => (
-              <li key={id}>
-                <button onClick={() => handleDeleteExpense(id)}>delete</button>{" "}
-                {elem.category}
-              </li>
-            ))}
-          </ul>
+          <p>total amount category: {totalCategory}</p>
+          <p> total amount expenses : {totalExpenses}</p>
+          <div>
+            <p>filter by value: </p>
+            <ul>
+              {minMaxFilterValue.map((elem, id) => (
+                <li key={id}>
+                  <button onClick={() => handleDeleteExpense(id)}>
+                    delete
+                  </button>{" "}
+                  {elem.category}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 
       <div className="expense_input_container">
-        <input
-          type="text"
-          name="category"
-          value={globalExpensesCategory}
-          placeholder="category"
-          onChange={(e) => setGlobalExpensesCategory(e.target.value)}
-        />
+        <label htmlFor="category">
+          Pick expense category
+          <select
+            name="category"
+            id="category"
+            value={globalExpensesCategory}
+            onChange={(e) => setGlobalExpensesCategory(e.target.value)}
+          >
+            <option value="">Select category</option>
+            <option value="transport">Transport</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="food">Food</option>
+            <option value="bills">Bills</option>
+            <option value="others">Others</option>
+          </select>
+        </label>
         <input
           type="text"
           name="description"
