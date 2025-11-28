@@ -9,10 +9,11 @@ export function createExpense(category, description, amount) {
   };
 }
 
-export function addExpense(category, description, amount, arr) {
-  let newArr = arr.push({
+export function addExpense(category, description, amount) {
+  const newArr = [];
+  newArr.push({
     category: category,
-    description: description,
+    expense: description,
     amount: amount,
   });
   return newArr;

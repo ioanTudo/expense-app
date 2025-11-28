@@ -84,7 +84,7 @@ export default function Home() {
           placeholder="filter max value"
           onChange={(e) => setMaxValue(+e.target.value)}
         />
-        <button onClick={handleAdvancedFilter}>advanced informations</button>
+        <button onClick={handleAdvancedFilter}>advanced info</button>
         <div className="advanced_info_container">
           <p>total amount category: {totalCategory}</p>
           <p> total amount expenses : {totalExpenses}</p>
